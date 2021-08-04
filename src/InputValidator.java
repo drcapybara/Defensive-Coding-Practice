@@ -34,6 +34,8 @@
  */
 public class InputValidator {
 
-
+    public InputValidator() {
+        System.out.println("this is a test");
+    }
 
 }
