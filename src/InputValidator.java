@@ -46,6 +46,8 @@ public class InputValidator {
     private File myInputFile;
     private File myOutputFile;
     private String myPassword;
+    private int mySum;
+    private int myProduct;
 
 
     public InputValidator() {
@@ -112,7 +114,6 @@ public class InputValidator {
     }
 
 
-
     public void addIntegers() {
         while ((myFirstInt > 0) && (mySecondInt > Integer.MAX_VALUE - myFirstInt) ||
                 ((myFirstInt < 0) && (mySecondInt < Integer.MIN_VALUE - myFirstInt))) {
@@ -120,6 +121,7 @@ public class InputValidator {
             getIntOne();
             getIntTwo();
         }
+        mySum = myFirstInt + mySecondInt;
     }
 
     public void multiplyIntegers() {
@@ -127,11 +129,12 @@ public class InputValidator {
                 (((myFirstInt == -1) && (mySecondInt == Integer.MIN_VALUE) ||
                 ((mySecondInt == -1) && (myFirstInt == Integer.MIN_VALUE))) ||
                  (myFirstInt > Integer.MAX_VALUE / mySecondInt) ||
-                ((myFirstInt < Integer.MAX_VALUE / mySecondInt)))) {
+                ((myFirstInt < Integer.MIN_VALUE / mySecondInt)))) {
             System.out.println("I feel like you bowl with the gutters up...");
             getIntOne();
             getIntTwo();
         }
+        myProduct = myFirstInt * mySecondInt;
     }
 
 
