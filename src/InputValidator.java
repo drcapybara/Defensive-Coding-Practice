@@ -50,10 +50,12 @@ public class InputValidator {
 
     public InputValidator() {
 
-        getFirstName();
-        getLastName();
+//        getFirstName();
+//        getLastName();
         getIntOne();
         getIntTwo();
+        addIntegers();
+        multiplyIntegers();
     }
 
 
@@ -104,10 +106,34 @@ public class InputValidator {
         System.out.println("Please enter another integer: ");
         while (!sc.hasNextInt()) {
             sc.nextLine();
-            System.out.println("Please enter a strin- wait I mean INTEGER... Please enter a valid integer...");
+            System.out.println("Please enter your favorite color- wait I mean INTEGER... Please enter a valid integer...");
         };
         mySecondInt = sc.nextInt();
     }
+
+
+
+    public void addIntegers() {
+        while ((myFirstInt > 0) && (mySecondInt > Integer.MAX_VALUE - myFirstInt) ||
+                ((myFirstInt < 0) && (mySecondInt < Integer.MIN_VALUE - myFirstInt))) {
+            System.out.println("Are you trying to spill something?");
+            getIntOne();
+            getIntTwo();
+        }
+    }
+
+    public void multiplyIntegers() {
+        while ((myFirstInt != 0 && mySecondInt != 0) &&
+                (((myFirstInt == -1) && (mySecondInt == Integer.MIN_VALUE) ||
+                ((mySecondInt == -1) && (myFirstInt == Integer.MIN_VALUE))) ||
+                 (myFirstInt > Integer.MAX_VALUE / mySecondInt) ||
+                ((myFirstInt < Integer.MAX_VALUE / mySecondInt)))) {
+            System.out.println("I feel like you bowl with the gutters up...");
+            getIntOne();
+            getIntTwo();
+        }
+    }
+
 
 
     /**
