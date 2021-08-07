@@ -1,4 +1,5 @@
 import java.io.File;
+import java.security.SecureRandom;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -48,16 +49,18 @@ public class InputValidator {
     private String myPassword;
     private int mySum;
     private int myProduct;
-
+    private final SecureRandom myRandom;
 
     public InputValidator() {
 
+        myRandom = new SecureRandom();
 //        getFirstName();
 //        getLastName();
-        getIntOne();
-        getIntTwo();
-        addIntegers();
-        multiplyIntegers();
+////        getIntOne();
+////        getIntTwo();
+////        addIntegers();
+////        multiplyIntegers();
+        getPassword();
     }
 
 
@@ -68,9 +71,9 @@ public class InputValidator {
         String regex = "^([a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð,'-]{2,50})$";
         String input = sc.nextLine();
 
-        while (checkPattern(input, regex)) {
-            sc.nextLine();
+        while (!checkPattern(input, regex)) {
             System.out.println("Im being really generous with what's allowed here... Please enter a valid first name... ");
+            input = sc.nextLine();
         };
         myFirstName = input;
     }
@@ -82,9 +85,9 @@ public class InputValidator {
         String regex = "^([a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð,'-]{2,50})$";
         String input = sc.nextLine();
 
-        while (checkPattern(input, regex)) {
-            sc.nextLine();
+        while (!checkPattern(input, regex)) {
             System.out.println("You're breaking my heart... Please enter a valid last name... ");
+            input = sc.nextLine();
         };
         myLastName = input;
 
@@ -96,7 +99,6 @@ public class InputValidator {
         System.out.println("Please enter an integer: ");
 
         while (!sc.hasNextInt()) {
-            sc.nextLine();
             System.out.println("But...I thought we were friends... Please enter a valid integer. ");
         };
         myFirstInt = sc.nextInt();
@@ -107,7 +109,6 @@ public class InputValidator {
         Scanner sc = new Scanner(System.in);
         System.out.println("Please enter another integer: ");
         while (!sc.hasNextInt()) {
-            sc.nextLine();
             System.out.println("Please enter your favorite color- wait I mean INTEGER... Please enter a valid integer...");
         };
         mySecondInt = sc.nextInt();
@@ -137,10 +138,48 @@ public class InputValidator {
         myProduct = myFirstInt * mySecondInt;
     }
 
+    /** 48as4tAa1!48as4tAa1! */
+    public void getPassword() {
 
+        String passwordRequirements = """
+                Please enter a password that contains at least:
+                   * 10 characters
+                   * and includes at least:
+                   * one upper case character,
+                   * lower case character,
+                   * digit,
+                   * punctuation mark,
+                   * and does not have more than 3 consecutive lower case characters:
+                """;
+
+        final int salt = myRandom.nextInt(Integer.MAX_VALUE);
+        String regex = "^(?=.{10,}$)(?=\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*([a-z])\\1{2}).*$";
+        Scanner sc = new Scanner(System.in);
+        System.out.println(passwordRequirements);
+        String password = sc.nextLine();
+        while (!checkPattern(password, regex)) {
+            System.out.println(passwordRequirements);
+            password = sc.nextLine();
+        }
+
+        String saltedPassword = password + salt;
+        System.out.println("I'm not echoing your password, that seems unsafe. I guess I can show you your salt though. \n" +
+                "Generated salt for this run: " + salt);
+        System.out.println("Please wait, hashing password + salt using Scrypt. \n" +
+                "This is taking a long time because I'm trying to thwart a timing analysis attack.");
+        String generatedSecuredPasswordHash = com.lambdaworks.crypto.SCryptUtil.scrypt(saltedPassword, 1048576, 8, 1);
+        System.out.println("Password hash generated: " + "\n" +generatedSecuredPasswordHash);
+        System.out.println("Please reenter password: ");
+        password = sc.nextLine();
+        boolean matched = com.lambdaworks.crypto.SCryptUtil.check(password + salt, generatedSecuredPasswordHash);
+        System.out.println("Rehashing, please wait...");
+        System.out.println("Password reentry + salt matches original entry :" + matched);
+        matched = com.lambdaworks.crypto.SCryptUtil.check("passwordno", generatedSecuredPasswordHash);
+        System.out.println(matched);
+    }
 
     /**
-     * Prompts for and reads the name of an output file from the user. Requires file extension.
+     * Prompts for and reads the name of an input file from the user. Requires file extension.
      * Valid: c:\Test.txt | \\server\shared\Test.txt | \\server\shared\Test.t
      * Invalid: c:\Test | \\server\shared | \\server\shared\Test.?
      *
@@ -168,6 +207,13 @@ public class InputValidator {
         myInputFile = inputFile;
     }
 
+    /**
+     * Prompts for and reads the name of an output file from the user. Requires file extension.
+     * Valid: c:\Test.txt | \\server\shared\Test.txt | \\server\shared\Test.t
+     * Invalid: c:\Test | \\server\shared | \\server\shared\Test.?
+     *
+     * https://regexlib.com/REDetails.aspx?regexp_id=425
+     * */
     private void getOutPutFile() {
 
         Scanner sc = new Scanner(System.in);
@@ -184,6 +230,7 @@ public class InputValidator {
         while (!outputFile.exists() || outputFile.isDirectory()) {
             sc.nextLine();
             System.out.println("I spent all of that time making this nice output file for you and you just pull it out from under me like that...rude");
+            getOutPutFile();
         }
         myOutputFile = outputFile;
     }
@@ -198,8 +245,8 @@ public class InputValidator {
         Pattern pattern = Pattern.compile(theRegex);
         Matcher matcher = pattern.matcher(theInputString);
         boolean matches = matcher.matches();
-        System.out.println("Matches RegEx test: " + matches);
-        return !matches;
+        System.out.println("Matches input requirements: " + matches);
+        return matches;
     }
 
 }
