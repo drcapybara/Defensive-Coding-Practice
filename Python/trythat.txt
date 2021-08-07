@@ -1,0 +1,20 @@
+First Name: <classes.Name object at 0x0000022DA4CC1A90>Last Name: <classes.Name object at 0x0000022DA4CB5C10>Result of adding integers given: 100Result of multiplying integers given: 2500This is a sentence.
+Lorem motherbleeping ipsum.
+First Name: Kittera
+Last Name: McCloud
+
+Result of adding integers given: 100
+Result of multiplying integers given: 2500
+
+Content of input file:This is a sentence.
+Lorem motherbleeping ipsum.
+APPENDING OUTPUT ON 2021-08-06 17:19:33.477834
+---------------------
+First Name: Kittera
+Last Name: McCloud
+
+Result of adding integers given: 7030
+Result of multiplying integers given: 210000
+
+Content of input file:This is a sentence.
+Lorem motherbleeping ipsum.
