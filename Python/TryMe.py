@@ -154,7 +154,8 @@ def get_password(salt):
             with open(temp_pwd, mode="xb") as tmp:
                 tmp.write(phrase.hashed)
             loop = False
-        except ValueError:
+        except ValueError as e:
+            print(e)
             print("Invalid password.")
             try:
                 os.remove(temp_pwd)
@@ -175,7 +176,7 @@ def confirm_password(hash_file, salt):
     os.remove(hash_file)
 
     try:
-        phrase_two = Password(given_word=input(" Confirm Password: "), given_salt=salt)
+        phrase_two = Password(given_word=input(" Confirm Password: "), given_salt=salt, confirming=True)
         confirmed = phrase_two.hashed == prev_hash
     except ValueError:
         confirmed = False
