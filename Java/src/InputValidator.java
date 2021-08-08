@@ -181,9 +181,10 @@ public class InputValidator {
 
         final SecureRandom random = new SecureRandom();
         mySalt = random.nextInt(Integer.MAX_VALUE);
-        String regex = "^(?=.{10,}$)(?=\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*([a-z])\\1{2}).*$";
+        String regex = "^(?=.*{10,}$)(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\\W])(?!.*([a-z])\\1{2}).*$";
+        System.out.println(passwordRequirements);
         Scanner sc = new Scanner(System.in);
-        String password = "";
+        String password = sc.nextLine();
         while (!checkPattern(password, regex)) {
             System.out.println(passwordRequirements);
             password = sc.nextLine();
@@ -195,15 +196,20 @@ public class InputValidator {
                 "This is taking a long time because I'm trying to thwart a timing analysis attack...");
         String generatedSecuredPasswordHash = com.lambdaworks.crypto.SCryptUtil.scrypt(saltedPassword, 1048576, 8, 1);
         System.out.println("Password hash generated: " + "\n" +generatedSecuredPasswordHash);
-        myPassword = password;
-        password = "";
-        while (!checkPattern(password, regex)) {
-            System.out.println("Please reenter password: ");
-            password = sc.nextLine();
-        }
+        System.out.println("Please reenter password: ");
 
+        password = sc.nextLine();
         System.out.println("Rehashing, please wait...");
         boolean matched = com.lambdaworks.crypto.SCryptUtil.check(password + mySalt, generatedSecuredPasswordHash);
+        while (!matched) {
+            System.out.println("Password reentry + salt matches original entry: " + matched);
+            System.out.println("Please reenter password: ");
+            password = sc.nextLine();
+            System.out.println("Rehashing, please wait...");
+            matched = com.lambdaworks.crypto.SCryptUtil.check(password + mySalt, generatedSecuredPasswordHash);
+        }
+
+        myPassword = password;
         System.out.println("Password reentry + salt matches original entry: " + matched);
         System.out.println("Checking something different against password hash, please wait...");
         matched = com.lambdaworks.crypto.SCryptUtil.check("passwordno", generatedSecuredPasswordHash);
@@ -223,19 +229,19 @@ public class InputValidator {
         Scanner sc = new Scanner(System.in);
         System.out.println("Please enter a path to an input file: ");
         String input = sc.nextLine();
-        String regex = "^([a-zA-Z]\\:|\\\\\\\\[^\\/\\\\:*?\"<>|]+\\\\[^\\/\\\\:*?\"<>|]+)(\\\\[^\\/\\\\:*?\"<>|]+)+(\\.[^\\/\\\\:*?\"<>|]+)$";
+        String regex = "^.*\\.txt$";
 
         //first check to see if filepath is of valid format.
         while (!checkPattern(input, regex)) {
-            sc.nextLine();
             System.out.println("No...Please...Stop...Please enter a valid path to an input file: ");
+            input = sc.nextLine();
         }
 
         //now check to see if that file actually exists.
         File inputFile = new File(input);
         while (!inputFile.exists() || inputFile.isDirectory()) {
-            sc.nextLine();
             System.out.println("If you're trying to break me you'll have to do better than that... :)");
+            input = sc.nextLine();
         }
         myInputFile = new BufferedReader(new FileReader(input));
     }
@@ -252,17 +258,22 @@ public class InputValidator {
         Scanner sc = new Scanner(System.in);
         System.out.println("Please enter a filepath to the location you wish to save the output file to: ");
         String input = sc.nextLine();
-        String regex = "^([a-zA-Z]\\:|\\\\\\\\[^\\/\\\\:*?\"<>|]+\\\\[^\\/\\\\:*?\"<>|]+)(\\\\[^\\/\\\\:*?\"<>|]+)$";
+        String regex = "^.*\\.txt$";
         //first check to see if filepath is of valid format.
-        while (checkPattern(input, regex)) {
-            sc.nextLine();
+        while (!checkPattern(input, regex)) {
             System.out.println("java.io.FileNotFoundException haha just kidding please enter a valid filepath to the output file: ");
+            input = sc.nextLine();
         }
         //now check to see if that file actually exists.
         File outputFile = new File(input);
-        while (!outputFile.exists() || outputFile.isDirectory()) {
-            sc.nextLine();
+
+        if (!outputFile.exists()) {
+            outputFile.createNewFile();
+        }
+
+        while (outputFile.isDirectory()) {
             System.out.println("I spent all of that time making this nice output file for you and you just pull it out from under me like that...rude");
+            input = sc.nextLine();
             getOutPutFile();
         }
         FileWriter fw = new FileWriter(input);
@@ -271,12 +282,23 @@ public class InputValidator {
 
     /** Writes the data obtained in this class line by line to the specified output file. */
     public void writeOutputFile() throws IOException {
-        myOutputFile.write("First and last name: \n" + myFirstName + " " + myLastName + "\n");
-        myOutputFile.write("User-specified integer #1: " + myFirstInt);
-        myOutputFile.write("User-specified integer #2: " + mySecondInt);
-        myOutputFile.write("Result of adding the two integer values: \n" + mySum + "\n");
-        myOutputFile.write("Result of multiplying the two integer values: \n" + myProduct + "\n");
-        myOutputFile.write("Contents of the input file: \n" + myInputFile + "\n");
+
+        myOutputFile.write("First and last name: \n" + myFirstName + " " + myLastName + "\n\n");
+        myOutputFile.write("User-specified integer #1: \n" + myFirstInt + "\n\n");
+        myOutputFile.write("User-specified integer #2: \n" + mySecondInt + "\n\n");
+        myOutputFile.write("Result of adding the two integer values: \n" + mySum + "\n\n");
+        myOutputFile.write("Result of multiplying the two integer values: \n" + myProduct + "\n\n");
+        myOutputFile.write("Contents of the input file: \n");
+        myInputFile.lines().forEach(line -> {
+            try {
+                myOutputFile.write(line);
+                myOutputFile.newLine();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+        myOutputFile.flush();
+        myOutputFile.close();
     }
 
 
@@ -289,7 +311,7 @@ public class InputValidator {
         Pattern pattern = Pattern.compile(theRegex);
         Matcher matcher = pattern.matcher(theInputString);
         //        System.out.println("Matches input requirements: " + matches);
-        return matcher.matches();
+        return matcher.find();
     }
 
 }
