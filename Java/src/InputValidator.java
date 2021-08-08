@@ -68,8 +68,6 @@ public class InputValidator {
         getInputFilePath(scan);
         getOutPutFile(scan);
         getPassword(scan);
-        addIntegers(scan);
-        multiplyIntegers(scan);
         writeOutputFile();
     }
 
@@ -133,22 +131,28 @@ public class InputValidator {
         }
         mySecondInt = theScan.nextInt();
 
-        addIntegers(theScan);
-        multiplyIntegers(theScan);
+        if (addIntegers(theScan)) {
+            multiplyIntegers(theScan);
+        }
+
+        theScan.nextLine();
     }
 
     /** Checks to see if adding the two integers overflows or underflows. Requests new integers
      * if overflow or underflow occurs.
      * @param theScan the input Scanner.
      */
-    public void addIntegers(final Scanner theScan) {
-        while ((myFirstInt > 0) && (mySecondInt > Integer.MAX_VALUE - myFirstInt) ||
-                ((myFirstInt < 0) && (mySecondInt < Integer.MIN_VALUE - myFirstInt))) {
+    public boolean addIntegers(final Scanner theScan) {
+        boolean overFlowOccurs = (myFirstInt > 0) && (mySecondInt > Integer.MAX_VALUE - myFirstInt) ||
+                ((myFirstInt < 0) && (mySecondInt < Integer.MIN_VALUE - myFirstInt));
+        if (overFlowOccurs) {
             System.out.println("Are you trying to spill something?");
             getIntOne(theScan);
             getIntTwo(theScan);
         }
         mySum = myFirstInt + mySecondInt;
+
+        return !overFlowOccurs;
     }
 
     /** Checks to see if integers can be multiplied on two's complement architecture, and also
@@ -157,7 +161,7 @@ public class InputValidator {
      * @param theScan the input Scanner.
      */
     public void multiplyIntegers(final Scanner theScan) {
-        while ((myFirstInt != 0 && mySecondInt != 0) &&
+        if ((myFirstInt != 0 && mySecondInt != 0) &&
                 (((myFirstInt == -1) && (mySecondInt == Integer.MIN_VALUE) ||
                 ((mySecondInt == -1) && (myFirstInt == Integer.MIN_VALUE))) ||
                  (myFirstInt > Integer.MAX_VALUE / mySecondInt) ||
@@ -185,7 +189,7 @@ public class InputValidator {
 
         //first check to see if filepath is of valid format.
         while (patternDoesNotMatch(input, regex)) {
-            System.out.println("No...Please...Stop...Please enter a valid path to an input file: ");
+            System.out.println("No...Please...Stop...Please enter a valid path to an input file ending with \".txt\": ");
             input = theScan.nextLine();
         }
 
@@ -194,6 +198,7 @@ public class InputValidator {
         while (!inputFile.exists() || inputFile.isDirectory()) {
             System.out.println("If you're trying to break me you'll have to do better than that... :)");
             input = theScan.nextLine();
+            inputFile = new File(input);
         }
         myInputFile = new BufferedReader(new FileReader(input));
     }
