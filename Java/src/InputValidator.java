@@ -56,107 +56,180 @@ public class InputValidator {
     private BufferedReader myInputFile;
     /** Output file specified by use.r */
     private BufferedWriter myOutputFile;
-    /** The result of hashing a user-supplied password combined with a secure salt. */
-    private String myPassword;
-    /** A secure random integer used as salt for password hashing. */
-    private int mySalt;
 
 
     /** Constructor */
     public InputValidator() throws IOException {
-        getFirstName();
-        getLastName();
-        getIntOne();
-        getIntTwo();
-        getInputFilePath();
-        getOutPutFile();
-        getPassword();
-        addIntegers();
-        multiplyIntegers();
+        final Scanner scan = new Scanner(System.in);
+        getFirstName(scan);
+        getLastName(scan);
+        getIntOne(scan);
+        getIntTwo(scan);
+        getInputFilePath(scan);
+        getOutPutFile(scan);
+        getPassword(scan);
+        addIntegers(scan);
+        multiplyIntegers(scan);
         writeOutputFile();
     }
 
     /** Gets first name string. Allows for international characters
-     * with valid range between 2 to 50 characters. */
-    private void getFirstName() {
+     * with valid range between 2 to 50 characters.
+     * @param theScan the input Scanner.
+     */
+    private void getFirstName(final Scanner theScan) {
 
-        Scanner sc = new Scanner(System.in);
         System.out.println("Please enter your first name: ");
         String regex = "^([a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð,'-]{2,50})$";
-        String input = sc.nextLine();
+        String input = theScan.nextLine();
 
-        while (!checkPattern(input, regex)) {
+        while (patternDoesNotMatch(input, regex)) {
             System.out.println("Im being really generous with what's allowed here... Please enter a valid first name... ");
-            input = sc.nextLine();
+            input = theScan.nextLine();
         }
         myFirstName = input;
     }
 
     /** Gets first name string. Allows for international characters
-     * with valid range between 2 and 50 characters. */
-    private void getLastName() {
+     * with valid range between 2 and 50 characters.
+     * @param theScan the input Scanner.
+     */
+    private void getLastName(final Scanner theScan) {
 
-        Scanner sc = new Scanner(System.in);
         System.out.println("Please enter your last name: ");
         String regex = "^([a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð,'-]{2,50})$";
-        String input = sc.nextLine();
+        String input = theScan.nextLine();
 
-        while (!checkPattern(input, regex)) {
+        while (patternDoesNotMatch(input, regex)) {
             System.out.println("You're breaking my heart... Please enter a valid last name... ");
-            input = sc.nextLine();
+            input = theScan.nextLine();
         }
         myLastName = input;
     }
 
-    /** Gets an integer. */
-    private void getIntOne() {
+    /** Gets an integer.
+     * @param theScan the input Scanner.
+     */
+    private void getIntOne(final Scanner theScan) {
 
-        Scanner sc = new Scanner(System.in);
         System.out.println("Please enter an integer: ");
 
-        while (!sc.hasNextInt()) {
+        while (!theScan.hasNextInt()) {
             System.out.println("But...I thought we were friends... Please enter a valid integer. ");
+            theScan.next();
         }
-        myFirstInt = sc.nextInt();
+        myFirstInt = theScan.nextInt();
     }
 
-    /**Gets another integer.  */
-    public void getIntTwo() {
+    /**Gets another integer.
+     * @param theScan the input Scanner.
+     */
+    public void getIntTwo(final Scanner theScan) {
 
-        Scanner sc = new Scanner(System.in);
         System.out.println("Please enter another integer: ");
-        while (!sc.hasNextInt()) {
+        while (!theScan.hasNextInt()) {
             System.out.println("Please enter your favorite color- wait I mean INTEGER... Please enter a valid integer...");
+            theScan.next();
         }
-        mySecondInt = sc.nextInt();
+        mySecondInt = theScan.nextInt();
+
+        addIntegers(theScan);
+        multiplyIntegers(theScan);
     }
 
     /** Checks to see if adding the two integers overflows or underflows. Requests new integers
-     * if overflow or underflow occurs. */
-    public void addIntegers() {
+     * if overflow or underflow occurs.
+     * @param theScan the input Scanner.
+     */
+    public void addIntegers(final Scanner theScan) {
         while ((myFirstInt > 0) && (mySecondInt > Integer.MAX_VALUE - myFirstInt) ||
                 ((myFirstInt < 0) && (mySecondInt < Integer.MIN_VALUE - myFirstInt))) {
             System.out.println("Are you trying to spill something?");
-            getIntOne();
-            getIntTwo();
+            getIntOne(theScan);
+            getIntTwo(theScan);
         }
         mySum = myFirstInt + mySecondInt;
     }
 
     /** Checks to see if integers can be multiplied on two's complement architecture, and also
      * checks to see that multiplication of the two integers will not cause overflow or underflow.
-     * Requests new integers if overflow or underflow will occur. */
-    public void multiplyIntegers() {
+     * Requests new integers if overflow or underflow will occur.
+     * @param theScan the input Scanner.
+     */
+    public void multiplyIntegers(final Scanner theScan) {
         while ((myFirstInt != 0 && mySecondInt != 0) &&
                 (((myFirstInt == -1) && (mySecondInt == Integer.MIN_VALUE) ||
                 ((mySecondInt == -1) && (myFirstInt == Integer.MIN_VALUE))) ||
                  (myFirstInt > Integer.MAX_VALUE / mySecondInt) ||
                 ((myFirstInt < Integer.MIN_VALUE / mySecondInt)))) {
             System.out.println("I feel like you bowl with the gutters up...");
-            getIntOne();
-            getIntTwo();
+            getIntOne(theScan);
+            getIntTwo(theScan);
         }
         myProduct = myFirstInt * mySecondInt;
+    }
+
+    /**
+     * Prompts for and reads the name of an input file from the user. Requires file extension.
+     * Valid: c:\Test.txt | \\server\shared\Test.txt | \\server\shared\Test.t
+     * Invalid: c:\Test | \\server\shared | \\server\shared\Test.?
+     *
+     * https://regexlib.com/REDetails.aspx?regexp_id=425
+     * @param theScan the input Scanner.
+     */
+    public void getInputFilePath(final Scanner theScan) throws FileNotFoundException {
+
+        System.out.println("Please enter a path to an input file: ");
+        String input = theScan.nextLine();
+        String regex = "^.*\\.txt$";
+
+        //first check to see if filepath is of valid format.
+        while (patternDoesNotMatch(input, regex)) {
+            System.out.println("No...Please...Stop...Please enter a valid path to an input file: ");
+            input = theScan.nextLine();
+        }
+
+        //now check to see if that file actually exists.
+        File inputFile = new File(input);
+        while (!inputFile.exists() || inputFile.isDirectory()) {
+            System.out.println("If you're trying to break me you'll have to do better than that... :)");
+            input = theScan.nextLine();
+        }
+        myInputFile = new BufferedReader(new FileReader(input));
+    }
+
+    /**
+     * Prompts for and reads the name of an output file from the user. Requires file extension.
+     * Valid: c:\Test.txt | \\server\shared\Test.txt | \\server\shared\Test.t
+     * Invalid: c:\Test | \\server\shared | \\server\shared\Test.?
+     *
+     * https://regexlib.com/REDetails.aspx?regexp_id=425
+     * @param theScan the input Scanner.
+     */
+    private void getOutPutFile(final Scanner theScan) throws IOException {
+
+        System.out.println("Please enter a filepath to the location you wish to save the output file to: ");
+        String input = theScan.nextLine();
+        String regex = "^.*\\.txt$";
+        //first check to see if filepath is of valid format.
+        while (patternDoesNotMatch(input, regex)) {
+            System.out.println("java.io.FileNotFoundException haha just kidding please enter a valid filepath to the output file: ");
+            input = theScan.nextLine();
+        }
+        //now check to see if that file actually exists.
+        File outputFile = new File(input);
+
+        if (outputFile.createNewFile()) {
+            System.out.println("The file specified was not found, so we made our own.");
+        }
+
+        while (outputFile.isDirectory()) {
+            System.out.println("I spent all of that time making this nice output file for you and you just pull it out from under me like that...rude");
+            input = theScan.nextLine();
+            getOutPutFile(theScan);
+        }
+        FileWriter fw = new FileWriter(input);
+        myOutputFile = new BufferedWriter(fw);
     }
 
     /** Gets a password from the user according to specific parameters. Uses the
@@ -166,8 +239,9 @@ public class InputValidator {
      * p: parallelization factor; fine-tunes the relative cpu-cost.
      * https://stackoverflow.com/questions/11126315/what-are-optimal-scrypt-work-factors
      * 48as4tAa1!48as4tAa1!
+     * @param theScan the input Scanner.
      */
-    public void getPassword() {
+    public void getPassword(final Scanner theScan) {
 
         String passwordRequirements = """
                 Please enter a password that contains at least:
@@ -180,14 +254,14 @@ public class InputValidator {
 
 
         final SecureRandom random = new SecureRandom();
-        mySalt = random.nextInt(Integer.MAX_VALUE);
+        // A secure random integer used as salt for password hashing.
+        int mySalt = random.nextInt(Integer.MAX_VALUE);
         String regex = "^(?=.*{10,}$)(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\\W])(?!.*([a-z])\\1{2}).*$";
         System.out.println(passwordRequirements);
-        Scanner sc = new Scanner(System.in);
-        String password = sc.nextLine();
-        while (!checkPattern(password, regex)) {
+        String password = theScan.nextLine();
+        while (patternDoesNotMatch(password, regex)) {
             System.out.println(passwordRequirements);
-            password = sc.nextLine();
+            password = theScan.nextLine();
         }
         String saltedPassword = password + mySalt;
 
@@ -198,86 +272,22 @@ public class InputValidator {
         System.out.println("Password hash generated: " + "\n" +generatedSecuredPasswordHash);
         System.out.println("Please reenter password: ");
 
-        password = sc.nextLine();
+        password = theScan.nextLine();
         System.out.println("Rehashing, please wait...");
         boolean matched = com.lambdaworks.crypto.SCryptUtil.check(password + mySalt, generatedSecuredPasswordHash);
         while (!matched) {
             System.out.println("Password reentry + salt matches original entry: " + matched);
             System.out.println("Please reenter password: ");
-            password = sc.nextLine();
+            password = theScan.nextLine();
             System.out.println("Rehashing, please wait...");
             matched = com.lambdaworks.crypto.SCryptUtil.check(password + mySalt, generatedSecuredPasswordHash);
         }
 
-        myPassword = password;
         System.out.println("Password reentry + salt matches original entry: " + matched);
         System.out.println("Checking something different against password hash, please wait...");
         matched = com.lambdaworks.crypto.SCryptUtil.check("passwordno", generatedSecuredPasswordHash);
         System.out.println("Something different matches password hash: " + matched);
-        sc.close();
-    }
-
-    /**
-     * Prompts for and reads the name of an input file from the user. Requires file extension.
-     * Valid: c:\Test.txt | \\server\shared\Test.txt | \\server\shared\Test.t
-     * Invalid: c:\Test | \\server\shared | \\server\shared\Test.?
-     *
-     * https://regexlib.com/REDetails.aspx?regexp_id=425
-     * */
-    public void getInputFilePath() throws FileNotFoundException {
-
-        Scanner sc = new Scanner(System.in);
-        System.out.println("Please enter a path to an input file: ");
-        String input = sc.nextLine();
-        String regex = "^.*\\.txt$";
-
-        //first check to see if filepath is of valid format.
-        while (!checkPattern(input, regex)) {
-            System.out.println("No...Please...Stop...Please enter a valid path to an input file: ");
-            input = sc.nextLine();
-        }
-
-        //now check to see if that file actually exists.
-        File inputFile = new File(input);
-        while (!inputFile.exists() || inputFile.isDirectory()) {
-            System.out.println("If you're trying to break me you'll have to do better than that... :)");
-            input = sc.nextLine();
-        }
-        myInputFile = new BufferedReader(new FileReader(input));
-    }
-
-    /**
-     * Prompts for and reads the name of an output file from the user. Requires file extension.
-     * Valid: c:\Test.txt | \\server\shared\Test.txt | \\server\shared\Test.t
-     * Invalid: c:\Test | \\server\shared | \\server\shared\Test.?
-     *
-     * https://regexlib.com/REDetails.aspx?regexp_id=425
-     * */
-    private void getOutPutFile() throws IOException {
-
-        Scanner sc = new Scanner(System.in);
-        System.out.println("Please enter a filepath to the location you wish to save the output file to: ");
-        String input = sc.nextLine();
-        String regex = "^.*\\.txt$";
-        //first check to see if filepath is of valid format.
-        while (!checkPattern(input, regex)) {
-            System.out.println("java.io.FileNotFoundException haha just kidding please enter a valid filepath to the output file: ");
-            input = sc.nextLine();
-        }
-        //now check to see if that file actually exists.
-        File outputFile = new File(input);
-
-        if (!outputFile.exists()) {
-            outputFile.createNewFile();
-        }
-
-        while (outputFile.isDirectory()) {
-            System.out.println("I spent all of that time making this nice output file for you and you just pull it out from under me like that...rude");
-            input = sc.nextLine();
-            getOutPutFile();
-        }
-        FileWriter fw = new FileWriter(input);
-        myOutputFile = new BufferedWriter(fw);
+        theScan.close();
     }
 
     /** Writes the data obtained in this class line by line to the specified output file. */
@@ -294,7 +304,8 @@ public class InputValidator {
                 myOutputFile.write(line);
                 myOutputFile.newLine();
             } catch (IOException e) {
-                e.printStackTrace();
+                System.out.println("An IO error occurred when writing to the specified output file. " +
+                        "Please try again later.");
             }
         });
         myOutputFile.flush();
@@ -307,11 +318,10 @@ public class InputValidator {
      * @param theInputString is the string to match.
      * @param theRegex is the regex to match against.
      */
-    private boolean checkPattern(final String theInputString, final String theRegex){
+    private boolean patternDoesNotMatch(final String theInputString, final String theRegex){
         Pattern pattern = Pattern.compile(theRegex);
         Matcher matcher = pattern.matcher(theInputString);
-        //        System.out.println("Matches input requirements: " + matches);
-        return matcher.find();
+        return !matcher.find();
     }
 
 }
