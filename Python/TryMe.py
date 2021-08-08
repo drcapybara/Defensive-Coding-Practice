@@ -95,16 +95,21 @@ def get_input_filename() -> str:
         proposed_path = input("Input Filename: ")
         if safe_path(os.getcwd(), proposed_path) and proposed_path.endswith(".txt"):
             try:
-                open(proposed_path, mode="r", errors="strict", encoding="utf-8").close()
+                file = open(proposed_path, mode="r", errors="strict", encoding="utf-8")
+                trash = file.read()
+                del trash
+                file.close()
                 return proposed_path
             except OSError:
-                print("File not found.")
-                loop = True
-            except ValueError:
-                print("")
+                print("File invalid.")
                 loop = True
             except UnicodeDecodeError:
+                print("File invalid.")
                 loop = True
+            except ValueError:
+                print("Try again.")
+                loop = True
+
 
 
 def get_output_filename() -> str:
@@ -180,7 +185,7 @@ def confirm_password(hash_file, salt):
 
 def output_to_file(data):
     with open(data["output_path"], mode="a", encoding="utf-8") as out_file:
-        out_file.write(f"APPENDING OUTPUT ON {datetime.datetime.now()}\n---------------------\n")
+        out_file.write(f"\nAPPENDING OUTPUT ON {datetime.datetime.now()}\n---------------------\n")
 
         out_file.write(f"First Name: {data['first_name']}\n")
         out_file.write(f"Last Name: {data['last_name']}\n")

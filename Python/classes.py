@@ -1,4 +1,5 @@
 import re
+from hashlib import scrypt
 
 
 class Name:
@@ -84,8 +85,6 @@ def strong_password(given: str) -> bool:
 
 class Password:
     def __init__(self, given_word, given_salt):
-        from hashlib import scrypt
-
         if strong_password(given_word):
             self.hashed = scrypt(
                 password=bytearray(given_word, encoding="utf-8"),
