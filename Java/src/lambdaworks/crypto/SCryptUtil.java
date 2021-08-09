@@ -6,7 +6,8 @@ import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
 import java.security.SecureRandom;
 
-import static com.lambdaworks.codec.Base64.*;
+import static com.lambdaworks.codec.Base64.decode;
+import static com.lambdaworks.codec.Base64.encode;
 
 /**
  * Simple {@link SCrypt} interface for hashing passwords using the

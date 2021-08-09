@@ -5,6 +5,7 @@ package com.lambdaworks.crypto;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.GeneralSecurityException;
+
 import static java.lang.System.arraycopy;
 
 /**

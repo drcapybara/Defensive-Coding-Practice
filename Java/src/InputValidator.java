@@ -56,10 +56,6 @@ public class InputValidator {
     private BufferedReader myInputFile;
     /** Output file specified by use.r */
     private BufferedWriter myOutputFile;
-    /** The result of hashing a user-supplied password combined with a secure salt. */
-    private String myPassword;
-    /** A secure random integer used as salt for password hashing. */
-    private int mySalt;
 
 
     /** Constructor */
@@ -82,7 +78,7 @@ public class InputValidator {
 
         Scanner sc = new Scanner(System.in);
         System.out.println("Please enter your first name: ");
-        String regex = "^([a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð,'-]{2,50})$";
+        String regex = "^([a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð'-]{2,50})$";
         String input = sc.nextLine();
 
         while (!checkPattern(input, regex)) {
@@ -98,7 +94,7 @@ public class InputValidator {
 
         Scanner sc = new Scanner(System.in);
         System.out.println("Please enter your last name: ");
-        String regex = "^([a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð,'-]{2,50})$";
+        String regex = "^([a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð'-]{2,50})$";
         String input = sc.nextLine();
 
         while (!checkPattern(input, regex)) {
@@ -145,13 +141,16 @@ public class InputValidator {
 
     /** Checks to see if integers can be multiplied on two's complement architecture, and also
      * checks to see that multiplication of the two integers will not cause overflow or underflow.
-     * Requests new integers if overflow or underflow will occur. */
+     * Requests new integers if overflow or underflow will occur. Takes absolute value of
+     * negative input for validation purposes. */
     public void multiplyIntegers() {
         while ((myFirstInt != 0 && mySecondInt != 0) &&
                 (((myFirstInt == -1) && (mySecondInt == Integer.MIN_VALUE) ||
-                ((mySecondInt == -1) && (myFirstInt == Integer.MIN_VALUE))) ||
-                 (myFirstInt > Integer.MAX_VALUE / mySecondInt) ||
-                ((myFirstInt < Integer.MIN_VALUE / mySecondInt)))) {
+                        //Check for negative 1 on 2's complement
+                        ((mySecondInt == -1) && (myFirstInt == Integer.MIN_VALUE))) ||
+                        (Math.abs(myFirstInt) > Math.abs(Integer.MAX_VALUE / mySecondInt)) ||
+                        ((Math.abs(myFirstInt) < Integer.MIN_VALUE / Math.abs(mySecondInt))))) {
+
             System.out.println("I feel like you bowl with the gutters up...");
             getIntOne();
             getIntTwo();
@@ -180,7 +179,7 @@ public class InputValidator {
 
 
         final SecureRandom random = new SecureRandom();
-        mySalt = random.nextInt(Integer.MAX_VALUE);
+        int salt = random.nextInt(Integer.MAX_VALUE);
         String regex = "^(?=.*{10,}$)(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\\W])(?!.*([a-z])\\1{2}).*$";
         System.out.println(passwordRequirements);
         Scanner sc = new Scanner(System.in);
@@ -189,9 +188,9 @@ public class InputValidator {
             System.out.println(passwordRequirements);
             password = sc.nextLine();
         }
-        String saltedPassword = password + mySalt;
+        String saltedPassword = password + salt;
 
-        System.out.println("Generated salt for this run: " + mySalt);
+        System.out.println("Generated salt for this run: " + salt);
         System.out.println("Please wait, hashing password + salt using Scrypt... \n" +
                 "This is taking a long time because I'm trying to thwart a timing analysis attack...");
         String generatedSecuredPasswordHash = com.lambdaworks.crypto.SCryptUtil.scrypt(saltedPassword, 1048576, 8, 1);
@@ -200,16 +199,15 @@ public class InputValidator {
 
         password = sc.nextLine();
         System.out.println("Rehashing, please wait...");
-        boolean matched = com.lambdaworks.crypto.SCryptUtil.check(password + mySalt, generatedSecuredPasswordHash);
+        boolean matched = com.lambdaworks.crypto.SCryptUtil.check(password + salt, generatedSecuredPasswordHash);
         while (!matched) {
             System.out.println("Password reentry + salt matches original entry: " + matched);
             System.out.println("Please reenter password: ");
             password = sc.nextLine();
             System.out.println("Rehashing, please wait...");
-            matched = com.lambdaworks.crypto.SCryptUtil.check(password + mySalt, generatedSecuredPasswordHash);
+            matched = com.lambdaworks.crypto.SCryptUtil.check(password + salt, generatedSecuredPasswordHash);
         }
 
-        myPassword = password;
         System.out.println("Password reentry + salt matches original entry: " + matched);
         System.out.println("Checking something different against password hash, please wait...");
         matched = com.lambdaworks.crypto.SCryptUtil.check("passwordno", generatedSecuredPasswordHash);
@@ -227,7 +225,7 @@ public class InputValidator {
     public void getInputFilePath() throws FileNotFoundException {
 
         Scanner sc = new Scanner(System.in);
-        System.out.println("Please enter a path to an input file: ");
+        System.out.println("Please enter a path to an input file: (.txt extension is required and directories are not allowed) ");
         String input = sc.nextLine();
         String regex = "^.*\\.txt$";
 
@@ -294,7 +292,12 @@ public class InputValidator {
                 myOutputFile.write(line);
                 myOutputFile.newLine();
             } catch (IOException e) {
-                e.printStackTrace();
+                System.out.println("There was a problem writing to the output file. ");
+                try {
+                    getOutPutFile();
+                } catch (IOException ex) {
+                    System.out.println("There was a problem writing to the output file. ");
+                }
             }
         });
         myOutputFile.flush();
