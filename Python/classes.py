@@ -84,14 +84,17 @@ def strong_password(given: str) -> bool:
 
 
 class Password:
-    def __init__(self, given_word, given_salt):
-        if strong_password(given_word):
+    def __init__(self, given_word, given_salt, confirming=False):
+        if strong_password(given_word) or confirming:
+            cpu_factor = 2 ** 20
+
             self.hashed = scrypt(
                 password=bytearray(given_word, encoding="utf-8"),
                 salt=bytearray(given_salt, encoding="utf-8"),
-                n=8192,
+                n=cpu_factor,
                 r=8,
-                p=2,
+                p=1,
+                maxmem=(cpu_factor * 2 * 8 * 65),
             )
         else:
             raise ValueError
