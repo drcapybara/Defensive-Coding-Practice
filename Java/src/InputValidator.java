@@ -32,7 +32,8 @@ import java.util.regex.Pattern;
  *                                                    Input File Name,
  *                                                    Input file contents)
  *
- * NOTE: it is ok to echo output to the screen as you wish
+ * Methods are intentionally left redundant to demonstrate the flow of information as it moves through
+ * the program.
  *
  * @author Dustin Ray
  * @version Summer 2021
@@ -142,7 +143,7 @@ public class InputValidator {
     /** Checks to see if integers can be multiplied on two's complement architecture, and also
      * checks to see that multiplication of the two integers will not cause overflow or underflow.
      * Requests new integers if overflow or underflow will occur. Takes absolute value of
-     * negative input for validation purposes. */
+     * negative input for general case validation purposes. */
     public void multiplyIntegers() {
         while ((myFirstInt != 0 && mySecondInt != 0) &&
                 (((myFirstInt == -1) && (mySecondInt == Integer.MIN_VALUE) ||
@@ -164,7 +165,7 @@ public class InputValidator {
      * r: blocksize in use for underlying hash; fine-tunes the relative memory-cost.
      * p: parallelization factor; fine-tunes the relative cpu-cost.
      * https://stackoverflow.com/questions/11126315/what-are-optimal-scrypt-work-factors
-     * 48as4tAa1!48as4tAa1!
+     * valid password example: 48as4tAa1!48as4tAa1!
      */
     public void getPassword() {
 
@@ -254,7 +255,7 @@ public class InputValidator {
     private void getOutPutFile() throws IOException {
 
         Scanner sc = new Scanner(System.in);
-        System.out.println("Please enter a filepath to the location you wish to save the output file to: ");
+        System.out.println("Please enter a filepath and name of the output file: (.txt extension required)");
         String input = sc.nextLine();
         String regex = "^.*\\.txt$";
         //first check to see if filepath is of valid format.
@@ -270,8 +271,7 @@ public class InputValidator {
         }
 
         while (outputFile.isDirectory()) {
-            System.out.println("I spent all of that time making this nice output file for you and you just pull it out from under me like that...rude");
-            input = sc.nextLine();
+            System.out.println("Directories are disallowed. ");
             getOutPutFile();
         }
         FileWriter fw = new FileWriter(input);
@@ -313,7 +313,6 @@ public class InputValidator {
     private boolean checkPattern(final String theInputString, final String theRegex){
         Pattern pattern = Pattern.compile(theRegex);
         Matcher matcher = pattern.matcher(theInputString);
-        //        System.out.println("Matches input requirements: " + matches);
         return matcher.find();
     }
 

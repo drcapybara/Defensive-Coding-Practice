@@ -58,7 +58,10 @@ class InputValidatorTest {
         myTestList.add("J j");
         myTestList.add("3");
         myTestList.add("!!");
-        myTestList.add("-,");
+        myTestList.add("-,)(*&^%$#@$%^&*(&^%$");
+        myTestList.add("-AAHDJKSHGDJA(&*S^%E$%D&*(SIAPJDKSNAM,");
+        myTestList.add("$s0$140801$bOHF7X7B/S0UVY8aM35Eug==$9EUHiYVZop/7dPkGUr7zNo9JUGLYodb0m8UNB7hKzEY=");
+
         for (String s : myTestList) {assertFalse(validator(s));}
     }
 
@@ -79,6 +82,25 @@ class InputValidatorTest {
                     ((myFirstIntList.get(i) < 0) && (mySecondIntList.get(i) < Integer.MIN_VALUE - myFirstIntList.get(i)))) {
                 fail("Overflow or underflow detected");}
         }
+
+
+        myFirstIntList.add(2147483647);     mySecondIntList.add(0);
+        myFirstIntList.add(2147483646);     mySecondIntList.add(1);
+        myFirstIntList.add(0);              mySecondIntList.add(2147483647);
+        myFirstIntList.add(2);              mySecondIntList.add(2);
+        myFirstIntList.add(-2147483647);    mySecondIntList.add(0);
+        myFirstIntList.add(-2147483646);    mySecondIntList.add(-1);
+
+        for (int i = 0; i < myFirstIntList.size(); i++) {
+            if ((myFirstIntList.get(i) > 0) && (mySecondIntList.get(i) > Integer.MAX_VALUE - myFirstIntList.get(i)) ||
+                    ((myFirstIntList.get(i) < 0) && (mySecondIntList.get(i) < Integer.MIN_VALUE - myFirstIntList.get(i)))) {
+                fail("Overflow or underflow detected");}
+        }
+
+
+
+
+
     }
 
     /** Tests pairs of integers to ensure that multiplication will not cause overflow
