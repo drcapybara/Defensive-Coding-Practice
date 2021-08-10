@@ -44,7 +44,7 @@ class InputValidatorTest {
     @Test
     void testGetFirstAndLastName() {
 
-        myRegEx = "^([a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð'-]{2,50})$";
+        myRegEx = "^([a-zA-Z'-]{2,50})$";
         myTestList.add("Jack");
         myTestList.add("jack");
         myTestList.add("JJ");
@@ -156,6 +156,51 @@ class InputValidatorTest {
     @Test
     public void testFilePath() {
 
+        myRegEx = "^(?:(?:[a-z]:|\\\\\\\\[a-z0-9_.$●-]+\\\\[a-z0-9_.$●-]+)\\\\|\\\\?[^\\\\:*?\"<>|↵\\r\\n]+\\\\?)(?:[^\\\\:*?\"<>|\\r\\n]+\\\\)*[^\\\\:*?\"<>|\\r\\n]*$";
+
+        //all of these should count as valid filepaths including on windows systems
+        myTestList.add("48as4tAaa1!");
+        myTestList.add("48as4tA1!!!");
+        myTestList.add("48as4tAa1!48as4tAa1!");
+        myTestList.add("48as4tAa1[");
+        myTestList.add("48as4tAa1!");
+        myTestList.add("48as4tAaaa1!");
+        myTestList.add("48as4tAaaa1!");
+        myTestList.add("48as4tAa1");
+        myTestList.add("AAAAA");
+        myTestList.add("AAAAa");
+        myTestList.add("1");
+        myTestList.add("12345");
+        myTestList.add("Jack");
+        myTestList.add("jack");
+        myTestList.add("JJ");
+        myTestList.add("JJ");
+        myTestList.add("JJ");
+        myTestList.add("JJ");
+        myTestList.add("Jack-Jack");
+        myTestList.add("Jack'OLantern");
+        myTestList.add("Jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj");
+        myTestList.add("file/file.tf");
+        myTestList.add("file/file");
+        myTestList.add("file/file.");
+        myTestList.add("file\\file");
+
+
+
+
+        for (String s : myTestList) {assertTrue(validator(s));}
+        myTestList.clear();
+
+        //windows reserved characters, disallow entry of these
+        myTestList.add("<");
+        myTestList.add(">");
+        myTestList.add(":");
+        myTestList.add("\"");
+        myTestList.add("");
+        myTestList.add("|");
+        myTestList.add("?");
+        myTestList.add("*");
+        for (String s : myTestList) {assertFalse(validator(s));}
 
     }
 

@@ -242,11 +242,11 @@ public class InputValidator {
             }
         } catch (InvalidPathException e) {
             System.out.println("Invalid file path entered, please use valid characters especially if you are on windows: ");
+            getInputFilePath();
         }
 
         //now check to see if that file actually exists.
-        File inputFile = new File(input);
-        while (!inputFile.exists() || inputFile.isDirectory()) {
+        while (!new File(input).exists() || new File(input).isDirectory()) {
             System.out.println("File does not exist or you supplied a bad path: please enter a valid file path: ");
             input = sc.nextLine();
         }
@@ -273,14 +273,19 @@ public class InputValidator {
             input = sc.nextLine();
         }
 
-        if (!(new File(input).exists())) {
-            boolean result = new File(input).createNewFile();
-            if (result) {
-                FileWriter fw = new FileWriter(input);
-                myOutputFile = new BufferedWriter(fw);
+        try {
+            if (!(new File(input).exists())) {
+                boolean result = new File(input).createNewFile();
+                if (result) {
+                    FileWriter fw = new FileWriter(input);
+                    myOutputFile = new BufferedWriter(fw);
+                }
+            } else {
+                System.out.println("Output file already exists, please specify a different output file: ");
+                getOutPutFile();
             }
-        } else {
-            System.out.println("Output file already exists, please specify a different output file: ");
+        }catch (InvalidPathException e) {
+            System.out.println("Invalid path detected, please try again: ");
             getOutPutFile();
         }
     }
