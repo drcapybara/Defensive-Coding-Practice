@@ -70,9 +70,9 @@ public class InputValidator {
 //        getIntTwo();
         getInputFilePath();
         getOutPutFile();
-        addIntegers();
-        multiplyIntegers();
-        getPassword();
+//        addIntegers();
+//        multiplyIntegers();
+//        getPassword();
         writeOutputFile();
     }
 
@@ -224,9 +224,16 @@ public class InputValidator {
     /** Prompts for and reads the name of an input file from the user. Requires file txt extension. */
     public void getInputFilePath() throws FileNotFoundException {
 
+        String regex = "^(?:(?:[a-z]:|\\\\\\\\[a-z0-9_.$●-]+\\\\[a-z0-9_.$●-]+)\\\\|\\\\?[^\\\\:*?\"<>|↵\\r\\n]+\\\\?)(?:[^\\\\:*?\"<>|\\r\\n]+\\\\)*[^\\\\:*?\"<>|\\r\\n]*$";
+
         Scanner sc = new Scanner(System.in);
         System.out.println("Please enter a path to an input file: (File must exist and can be of any format) ");
         String input = sc.nextLine();
+
+        while (checkPattern(input, regex)) {
+            System.out.println("Invalid characters in file path, please try again: ");
+            input = sc.nextLine();
+        }
 
         try {
             while (!Paths.get(input).toFile().exists()) {
@@ -249,13 +256,20 @@ public class InputValidator {
     /** Prompts for and reads the name of an input file from the user. Requires file txt extension. */
     private void getOutPutFile() throws IOException {
 
+        String regex = "^(?:(?:[a-z]:|\\\\\\\\[a-z0-9_.$●-]+\\\\[a-z0-9_.$●-]+)\\\\|\\\\?[^\\\\:*?\"<>|↵\\r\\n]+\\\\?)(?:[^\\\\:*?\"<>|\\r\\n]+\\\\)*[^\\\\:*?\"<>|\\r\\n]*$";
+
         Scanner sc = new Scanner(System.in);
 
         System.out.println("Please enter a path to an output file: File cannot already exist: ");
         String input = sc.nextLine();
 
+        while (checkPattern(input, regex)) {
+            System.out.println("Invalid characters in file path, please try again: ");
+            input = sc.nextLine();
+        }
+
         while (input.length() == 0) {
-            System.out.println("Please enter a valid output filepath: ");
+            System.out.println("Please enter a valid output filepath, length of path must be greater than zero: ");
             input = sc.nextLine();
         }
 
