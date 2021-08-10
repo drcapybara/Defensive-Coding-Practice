@@ -1,5 +1,6 @@
 import java.io.*;
 import java.math.BigInteger;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Paths;
 import java.security.SecureRandom;
 import java.util.Scanner;
@@ -63,10 +64,10 @@ public class InputValidator {
 
     /** Constructor */
     public InputValidator() throws IOException {
-        getFirstName();
-        getLastName();
-        getIntOne();
-        getIntTwo();
+//        getFirstName();
+//        getLastName();
+//        getIntOne();
+//        getIntTwo();
         getInputFilePath();
         getOutPutFile();
         addIntegers();
@@ -227,9 +228,13 @@ public class InputValidator {
         System.out.println("Please enter a path to an input file: (File must exist and can be of any format) ");
         String input = sc.nextLine();
 
-        while(!Paths.get(input).toFile().exists()) {
-            System.out.println("file does not exist or invalid path was supplied, lets bring it around for another try. Please enter a path to a file: ");
-            input = sc.nextLine();
+        try {
+            while (!Paths.get(input).toFile().exists()) {
+                System.out.println("file does not exist or invalid path was supplied, lets bring it around for another try. Please enter a path to a file: ");
+                input = sc.nextLine();
+            }
+        } catch (InvalidPathException e) {
+            System.out.println("Invalid file path entered, please use valid characters especially if you are on windows: ");
         }
 
         //now check to see if that file actually exists.
