@@ -64,15 +64,15 @@ public class InputValidator {
 
     /** Constructor */
     public InputValidator() throws IOException {
-//        getFirstName();
-//        getLastName();
-//        getIntOne();
-//        getIntTwo();
+        getFirstName();
+        getLastName();
+        getIntOne();
+        getIntTwo();
         getInputFilePath();
         getOutPutFile();
-//        addIntegers();
-//        multiplyIntegers();
-//        getPassword();
+        addIntegers();
+        multiplyIntegers();
+        getPassword();
         writeOutputFile();
     }
 
@@ -284,8 +284,11 @@ public class InputValidator {
                 System.out.println("Output file already exists, please specify a different output file: ");
                 getOutPutFile();
             }
-        }catch (InvalidPathException e) {
+        } catch (InvalidPathException e) {
             System.out.println("Invalid path detected, please try again: ");
+            getOutPutFile();
+        } catch (IOException e) {
+            System.out.println("possible permission violation, please try again and stay the heck away from my sensitive files: ");
             getOutPutFile();
         }
     }
