@@ -1,6 +1,5 @@
 import java.io.*;
 import java.math.BigInteger;
-import java.nio.file.InvalidPathException;
 import java.nio.file.Paths;
 import java.security.SecureRandom;
 import java.util.Scanner;
@@ -60,16 +59,14 @@ public class InputValidator {
     private BufferedReader myInputFile;
     /** Output file specified by use.r */
     private BufferedWriter myOutputFile;
-    /** Input filepath obtained from input file method. */
-    private String myInputFilePath;
 
 
     /** Constructor */
     public InputValidator() throws IOException {
-//        getFirstName();
-//        getLastName();
-//        getIntOne();
-//        getIntTwo();
+        getFirstName();
+        getLastName();
+        getIntOne();
+        getIntTwo();
         getInputFilePath();
         getOutPutFile();
         addIntegers();
@@ -92,7 +89,7 @@ public class InputValidator {
         String regex = "^([a-zA-Z-']{2,50})$";
         String input = sc.nextLine();
 
-        while (!checkPattern(input, regex)) {
+        while (checkPattern(input, regex)) {
             System.out.println("Im being really generous with what's allowed here... Please enter a valid first name... ");
             input = sc.nextLine();
         }
@@ -115,7 +112,7 @@ public class InputValidator {
         String regex = "^([a-zA-Z-']{2,50})$";
         String input = sc.nextLine();
 
-        while (!checkPattern(input, regex)) {
+        while (checkPattern(input, regex)) {
             System.out.println(nameRequirements);
             input = sc.nextLine();
         }
@@ -192,7 +189,7 @@ public class InputValidator {
         System.out.println(passwordRequirements);
         Scanner sc = new Scanner(System.in);
         String password = sc.nextLine();
-        while (!checkPattern(password, regex)) {
+        while (checkPattern(password, regex)) {
             System.out.println(passwordRequirements);
             password = sc.nextLine();
         }
@@ -209,14 +206,14 @@ public class InputValidator {
         System.out.println("Rehashing, please wait...");
         boolean matched = com.lambdaworks.crypto.SCryptUtil.check(password + salt, generatedSecuredPasswordHash);
         while (!matched) {
-            System.out.println("Password reentry + salt matches original entry: " + matched);
+            System.out.println("Password reentry + salt matches original entry: " + false);
             System.out.println("Please reenter password: ");
             password = sc.nextLine();
             System.out.println("Rehashing, please wait...");
             matched = com.lambdaworks.crypto.SCryptUtil.check(password + salt, generatedSecuredPasswordHash);
         }
 
-        System.out.println("Password reentry + salt matches original entry: " + matched);
+        System.out.println("Password reentry + salt matches original entry: " + true);
         System.out.println("Checking something different against password hash, please wait...");
         matched = com.lambdaworks.crypto.SCryptUtil.check("passwordno", generatedSecuredPasswordHash);
         System.out.println("Something different matches password hash: " + matched);
@@ -241,7 +238,6 @@ public class InputValidator {
             System.out.println("File does not exist or you supplied a bad path: please enter a valid file path: ");
             input = sc.nextLine();
         }
-        myInputFilePath = input;
         myInputFile = new BufferedReader(new FileReader(input));
     }
 
@@ -249,9 +245,14 @@ public class InputValidator {
     private void getOutPutFile() throws IOException {
 
         Scanner sc = new Scanner(System.in);
+
         System.out.println("Please enter a path to an output file: File cannot already exist: ");
         String input = sc.nextLine();
 
+        while (input.length() == 0) {
+            System.out.println("Please enter a valid output filepath: ");
+            input = sc.nextLine();
+        }
 
         if (!(new File(input).exists())) {
             boolean result = new File(input).createNewFile();
@@ -262,11 +263,6 @@ public class InputValidator {
         } else {
             System.out.println("Output file already exists, please specify a different output file: ");
             getOutPutFile();
-        }
-
-        while (new File(input).isDirectory() || myInputFilePath.equals(input)) {
-            System.out.println("Cannot overwrite the selected input file: please enter a valid output file path: ");
-            input = sc.nextLine();
         }
     }
 
@@ -306,7 +302,7 @@ public class InputValidator {
     private boolean checkPattern(final String theInputString, final String theRegex){
         Pattern pattern = Pattern.compile(theRegex);
         Matcher matcher = pattern.matcher(theInputString);
-        return matcher.find();
+        return !matcher.find();
     }
 
 }
