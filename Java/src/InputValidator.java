@@ -1,4 +1,7 @@
 import java.io.*;
+import java.math.BigInteger;
+import java.nio.file.InvalidPathException;
+import java.nio.file.Paths;
 import java.security.SecureRandom;
 import java.util.Scanner;
 import java.util.regex.Matcher;
@@ -50,36 +53,43 @@ public class InputValidator {
     /** Another integer. */
     private int mySecondInt;
     /** Result of adding the two integers. */
-    private int mySum;
+    private BigInteger mySum;
     /** Result of multiplying the two integers. */
-    private int myProduct;
+    private BigInteger myProduct;
     /** Input file obtained from input file method. */
     private BufferedReader myInputFile;
     /** Output file specified by use.r */
     private BufferedWriter myOutputFile;
+    /** Input filepath obtained from input file method. */
+    private String myInputFilePath;
 
 
     /** Constructor */
     public InputValidator() throws IOException {
-        getFirstName();
-        getLastName();
-        getIntOne();
-        getIntTwo();
+//        getFirstName();
+//        getLastName();
+//        getIntOne();
+//        getIntTwo();
         getInputFilePath();
         getOutPutFile();
-        getPassword();
         addIntegers();
         multiplyIntegers();
+        getPassword();
         writeOutputFile();
     }
 
-    /** Gets first name string. Allows for international characters
+    /** Gets first name string.
      * with valid range between 2 to 50 characters. */
     private void getFirstName() {
 
+        String nameRequirements = """
+                Please enter your first name:
+                Valid characters can be a-z, A-Z, -'
+                Minimum 2 characters required, maximum of 50 allowed:""";
+
         Scanner sc = new Scanner(System.in);
-        System.out.println("Please enter your first name: ");
-        String regex = "^([a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð'-]{2,50})$";
+        System.out.println(nameRequirements);
+        String regex = "^([a-zA-Z-']{2,50})$";
         String input = sc.nextLine();
 
         while (!checkPattern(input, regex)) {
@@ -87,19 +97,26 @@ public class InputValidator {
             input = sc.nextLine();
         }
         myFirstName = input;
+
+
     }
 
-    /** Gets first name string. Allows for international characters
-     * with valid range between 2 and 50 characters. */
+    /** Gets last name string.
+     * with valid range between 2 to 50 characters. */
     private void getLastName() {
 
+        String nameRequirements = """
+                Please enter your last name:
+                Valid characters can be a-z, A-Z, -'
+                Minimum 2 characters required, maximum of 50 allowed:""";
+
         Scanner sc = new Scanner(System.in);
-        System.out.println("Please enter your last name: ");
-        String regex = "^([a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð'-]{2,50})$";
+        System.out.println(nameRequirements);
+        String regex = "^([a-zA-Z-']{2,50})$";
         String input = sc.nextLine();
 
         while (!checkPattern(input, regex)) {
-            System.out.println("You're breaking my heart... Please enter a valid last name... ");
+            System.out.println(nameRequirements);
             input = sc.nextLine();
         }
         myLastName = input;
@@ -112,7 +129,8 @@ public class InputValidator {
         System.out.println("Please enter an integer: ");
 
         while (!sc.hasNextInt()) {
-            System.out.println("But...I thought we were friends... Please enter a valid integer. ");
+            System.out.println("Please enter a valid integer: ");
+            sc.nextLine();
         }
         myFirstInt = sc.nextInt();
     }
@@ -123,7 +141,8 @@ public class InputValidator {
         Scanner sc = new Scanner(System.in);
         System.out.println("Please enter another integer: ");
         while (!sc.hasNextInt()) {
-            System.out.println("Please enter your favorite color- wait I mean INTEGER... Please enter a valid integer...");
+            System.out.println("But...I thought we were friends... Please enter a valid integer. ");
+            sc.nextLine();
         }
         mySecondInt = sc.nextInt();
     }
@@ -131,13 +150,10 @@ public class InputValidator {
     /** Checks to see if adding the two integers overflows or underflows. Requests new integers
      * if overflow or underflow occurs. */
     public void addIntegers() {
-        while ((myFirstInt > 0) && (mySecondInt > Integer.MAX_VALUE - myFirstInt) ||
-                ((myFirstInt < 0) && (mySecondInt < Integer.MIN_VALUE - myFirstInt))) {
-            System.out.println("Are you trying to spill something?");
-            getIntOne();
-            getIntTwo();
-        }
-        mySum = myFirstInt + mySecondInt;
+
+        mySum = new BigInteger(String.valueOf(myFirstInt));
+        mySum = mySum.add(new BigInteger(String.valueOf(mySecondInt)));
+
     }
 
     /** Checks to see if integers can be multiplied on two's complement architecture, and also
@@ -145,18 +161,9 @@ public class InputValidator {
      * Requests new integers if overflow or underflow will occur. Takes absolute value of
      * negative input for general case validation purposes. */
     public void multiplyIntegers() {
-        while ((myFirstInt != 0 && mySecondInt != 0) &&
-                (((myFirstInt == -1) && (mySecondInt == Integer.MIN_VALUE) ||
-                        //Check for negative 1 on 2's complement
-                        ((mySecondInt == -1) && (myFirstInt == Integer.MIN_VALUE))) ||
-                        (Math.abs(myFirstInt) > Math.abs(Integer.MAX_VALUE / mySecondInt)) ||
-                        ((Math.abs(myFirstInt) < Integer.MIN_VALUE / Math.abs(mySecondInt))))) {
 
-            System.out.println("I feel like you bowl with the gutters up...");
-            getIntOne();
-            getIntTwo();
-        }
-        myProduct = myFirstInt * mySecondInt;
+        myProduct = new BigInteger(String.valueOf(myFirstInt));
+        myProduct = myProduct.multiply(BigInteger.valueOf(mySecondInt));
     }
 
     /** Gets a password from the user according to specific parameters. Uses the
@@ -216,67 +223,56 @@ public class InputValidator {
         sc.close();
     }
 
-    /**
-     * Prompts for and reads the name of an input file from the user. Requires file extension.
-     * Valid: c:\Test.txt | \\server\shared\Test.txt | \\server\shared\Test.t
-     * Invalid: c:\Test | \\server\shared | \\server\shared\Test.?
-     *
-     * https://regexlib.com/REDetails.aspx?regexp_id=425
-     * */
+    /** Prompts for and reads the name of an input file from the user. Requires file txt extension. */
     public void getInputFilePath() throws FileNotFoundException {
 
         Scanner sc = new Scanner(System.in);
-        System.out.println("Please enter a path to an input file: (.txt extension is required and directories are not allowed) ");
+        System.out.println("Please enter a path to an input file: ");
         String input = sc.nextLine();
-        String regex = "^.*\\.txt$";
 
-        //first check to see if filepath is of valid format.
-        while (!checkPattern(input, regex)) {
-            System.out.println("No...Please...Stop...Please enter a valid path to an input file: ");
+        while(!Paths.get(input).toFile().exists()) {
+            System.out.println("file does not exist or invalid path was supplied, lets bring it around for another try. Please enter a path to a file: ");
             input = sc.nextLine();
         }
 
         //now check to see if that file actually exists.
         File inputFile = new File(input);
         while (!inputFile.exists() || inputFile.isDirectory()) {
-            System.out.println("If you're trying to break me you'll have to do better than that... :)");
+            System.out.println("File does not exist or you supplied a bad path: please enter a valid file path: ");
             input = sc.nextLine();
         }
+        myInputFilePath = input;
         myInputFile = new BufferedReader(new FileReader(input));
     }
 
-    /**
-     * Prompts for and reads the name of an output file from the user. Requires file extension.
-     * Valid: c:\Test.txt | \\server\shared\Test.txt | \\server\shared\Test.t
-     * Invalid: c:\Test | \\server\shared | \\server\shared\Test.?
-     *
-     * https://regexlib.com/REDetails.aspx?regexp_id=425
-     * */
+    /** Prompts for and reads the name of an input file from the user. Requires file txt extension. */
     private void getOutPutFile() throws IOException {
 
         Scanner sc = new Scanner(System.in);
-        System.out.println("Please enter a filepath and name of the output file: (.txt extension required)");
+        System.out.println("Please enter a path to an output file: File cannot already exist: ");
         String input = sc.nextLine();
-        String regex = "^.*\\.txt$";
-        //first check to see if filepath is of valid format.
-        while (!checkPattern(input, regex)) {
-            System.out.println("java.io.FileNotFoundException haha just kidding please enter a valid filepath to the output file: ");
-            input = sc.nextLine();
-        }
-        //now check to see if that file actually exists.
-        File outputFile = new File(input);
 
-        if (!outputFile.exists()) {
-            outputFile.createNewFile();
-        }
 
-        while (outputFile.isDirectory()) {
-            System.out.println("Directories are disallowed. ");
+        if (!(new File(input).exists())) {
+            boolean result = new File(input).createNewFile();
+            if (result) {
+                FileWriter fw = new FileWriter(input);
+                myOutputFile = new BufferedWriter(fw);
+            }
+        } else {
+            System.out.println("Output file already exists, please specify a different output file: ");
             getOutPutFile();
         }
-        FileWriter fw = new FileWriter(input);
-        myOutputFile = new BufferedWriter(fw);
+
+        while (new File(input).isDirectory() || myInputFilePath.equals(input)) {
+            System.out.println("Cannot overwrite the selected input file: please enter a valid output file path: ");
+            input = sc.nextLine();
+        }
+
+
+
     }
+
 
     /** Writes the data obtained in this class line by line to the specified output file. */
     public void writeOutputFile() throws IOException {

@@ -54,6 +54,7 @@ class InputValidatorTest {
         for (String s : myTestList) {assertTrue(validator(s));}
         myTestList.clear();
 
+        myTestList.add("");
         myTestList.add("J");
         myTestList.add("J j");
         myTestList.add("3");
@@ -65,11 +66,12 @@ class InputValidatorTest {
         for (String s : myTestList) {assertFalse(validator(s));}
     }
 
-    /** Tests pairs of integers to make sure that addition will not cause overflow
-     * or underflow. */
+    /** It seems this approach was not the intention of the assignment. However, if one wanted to implement
+     * strict integer addition or multiplication, this approach ensures that valid input is received and that
+     * the result should then always be an integer. */
     @Test
     public void testAddInteger() {
-        //add this                          to this
+        //want to add this                  to this
         myFirstIntList.add(2147483647);     mySecondIntList.add(0);
         myFirstIntList.add(2147483646);     mySecondIntList.add(1);
         myFirstIntList.add(0);              mySecondIntList.add(2147483647);
@@ -82,32 +84,14 @@ class InputValidatorTest {
                     ((myFirstIntList.get(i) < 0) && (mySecondIntList.get(i) < Integer.MIN_VALUE - myFirstIntList.get(i)))) {
                 fail("Overflow or underflow detected");}
         }
-
-
-        myFirstIntList.add(2147483647);     mySecondIntList.add(0);
-        myFirstIntList.add(2147483646);     mySecondIntList.add(1);
-        myFirstIntList.add(0);              mySecondIntList.add(2147483647);
-        myFirstIntList.add(2);              mySecondIntList.add(2);
-        myFirstIntList.add(-2147483647);    mySecondIntList.add(0);
-        myFirstIntList.add(-2147483646);    mySecondIntList.add(-1);
-
-        for (int i = 0; i < myFirstIntList.size(); i++) {
-            if ((myFirstIntList.get(i) > 0) && (mySecondIntList.get(i) > Integer.MAX_VALUE - myFirstIntList.get(i)) ||
-                    ((myFirstIntList.get(i) < 0) && (mySecondIntList.get(i) < Integer.MIN_VALUE - myFirstIntList.get(i)))) {
-                fail("Overflow or underflow detected");}
-        }
-
-
-
-
-
     }
 
-    /** Tests pairs of integers to ensure that multiplication will not cause overflow
-     * or underflow. */
+    /** It seems this approach was not the intention of the assignment. However, if one wanted to implement
+     * strict integer addition or multiplication, this approach ensures that valid input is received and that
+     * the result should then always be an integer. */
     @Test
     public void testMultiplyInteger() {
-        //multiply this                     by this
+        //want to multiply this             by this
         myFirstIntList.add(2147483647);     mySecondIntList.add(0);
         myFirstIntList.add(2147483646);     mySecondIntList.add(1);
         myFirstIntList.add(2147483647);     mySecondIntList.add(1);
@@ -115,6 +99,7 @@ class InputValidatorTest {
         myFirstIntList.add(2);              mySecondIntList.add(2);
         myFirstIntList.add(-2147483647);    mySecondIntList.add(0);
         myFirstIntList.add(-1);             mySecondIntList.add(-2147483646);
+        myFirstIntList.add(-2147483646);    mySecondIntList.add(-1);
         myFirstIntList.add(-2147483647);    mySecondIntList.add(-1);
         myFirstIntList.add(0);              mySecondIntList.add(0);
 
@@ -123,11 +108,60 @@ class InputValidatorTest {
                     (((myFirstIntList.get(i) == -1) && (mySecondIntList.get(i) == Integer.MIN_VALUE) ||
                             ((mySecondIntList.get(i) == -1) && (myFirstIntList.get(i) == Integer.MIN_VALUE))) ||
                             (Math.abs(myFirstIntList.get(i)) > Math.abs(Integer.MAX_VALUE / mySecondIntList.get(i))) ||
-                            ((Math.abs(myFirstIntList.get(i)) < Integer.MIN_VALUE / Math.abs(mySecondIntList.get(i)))))) {
+                            (myFirstIntList.get(i) < Integer.MIN_VALUE / Math.abs(mySecondIntList.get(i))))) {
                 System.out.println((myFirstIntList.get(i) * mySecondIntList.get(i)));
                 fail("Overflow or underflow detected");}
         }
     }
+
+
+    /**
+     * Uses RegEx to validate theInputString as a password that contains at least
+     *                10 characters
+     *                and includes at least:
+     *                one upper case character,
+     *                lower case character,
+     *                digit,
+     *                punctuation mark,
+     *                and does not have more than 3 consecutive lower case characters
+     *
+     */
+    @Test
+    public void testPassword() {
+
+        myRegEx = "^(?=.{10,}$)(?=\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*([a-z])\\1{2}).*$";
+
+        myTestList.add("48as4tAaa1!");
+        myTestList.add("48as4tA1!!!");
+        myTestList.add("48as4tAa1!48as4tAa1!");
+        myTestList.add("48as4tAa1[");
+        myTestList.add("48as4tAa1!");
+
+        for (String s : myTestList) {assertTrue(validator(s));}
+
+        myTestList.clear();
+        myTestList.add("8as4tAa1!");
+        myTestList.add("48as4tAaaa1!");
+        myTestList.add("48as4tAaaa1!");
+        myTestList.add("48as4tAa1");
+        myTestList.add("AAAAA");
+        myTestList.add("AAAAa");
+        myTestList.add("1");
+        myTestList.add("12345");
+
+        for (String s : myTestList) {assertFalse(validator(s));}
+
+    }
+
+    @Test
+    public void testFilePath() {
+
+
+    }
+
+
+
+
 
     /**
      * I am validator. Feed me input.
