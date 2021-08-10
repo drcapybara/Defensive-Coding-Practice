@@ -33,7 +33,7 @@ def get_integers() -> (FourByteSignedInt, FourByteSignedInt):
         "------------------------------------\n"
         "Step 2: Four-Byte Numbers\n"
         "Allowed Characters: 0-9 , -\n"
-        "Character Count: 1..14"
+        "Allowed Character Count: 1..14"
     )
 
     def flow_enforcement(val_1, val_2):
@@ -44,24 +44,15 @@ def get_integers() -> (FourByteSignedInt, FourByteSignedInt):
         a = int(val_1.value)
         b = int(val_2.value)
 
-        addition_overflow = (b > 0) and (a > FourByteSignedInt.four_byte_max - b)
-        addition_underflow = (b < 0) and (a < FourByteSignedInt.four_byte_min - b)
-
-        if addition_overflow or addition_underflow:
-            raise ValueError
-
-        mult_overflow = (
-            (a == -1 and b == FourByteSignedInt.four_byte_min)
-            or (b == -1 and a == FourByteSignedInt.four_byte_min)
-            or (a > (FourByteSignedInt.four_byte_max / b))
+        valid_range = (
+                FourByteSignedInt.four_byte_min <= a <= FourByteSignedInt.four_byte_max
+                and FourByteSignedInt.four_byte_min <= b <= FourByteSignedInt.four_byte_max
         )
-        mult_underflow = a < (FourByteSignedInt.four_byte_min / b)
 
-        if mult_overflow or mult_underflow:
+        if not valid_range:
             raise ValueError
 
     loop = True
-
     num1 = FourByteSignedInt("0")
     num2 = FourByteSignedInt("1")
 
@@ -111,17 +102,20 @@ def get_input_filename() -> str:
                 loop = True
 
 
-
-def get_output_filename() -> str:
+def get_output_filename(in_file_name: str) -> str:
     print(
         "------------------------------------\n"
         "Step 4: Output File\n"
-        "The output file may only be a txt file placed under the same directory as TryMe.py"
+        "The output file may only be a txt file placed under the same directory as TryMe.py\n"
+        "The output file name may not be the same as that of the input file."
     )
     loop = True
     while loop:
         proposed_path = input("Input Filename: ")
         if safe_path(os.getcwd(), proposed_path) and proposed_path.endswith(".txt"):
+            if proposed_path == in_file_name:
+                print("Filename cannot match input.")
+                continue
             try:
                 open(proposed_path, mode="a", errors="strict", encoding="utf-8").close()
                 return proposed_path
@@ -169,7 +163,6 @@ def get_password(salt):
 
 
 def confirm_password(hash_file, salt):
-
     with open(hash_file, mode="rb") as prev_hash_file:
         prev_hash = prev_hash_file.read()
 
@@ -216,7 +209,7 @@ def main():
     f_name, l_name = get_names()
     num1, num2 = get_integers()
     input_file = get_input_filename()
-    output_file = get_output_filename()
+    output_file = get_output_filename(input_file)
 
     passwords_bad = True
     while passwords_bad:
