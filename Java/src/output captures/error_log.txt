@@ -1,0 +1,42 @@
+2021/08/09 22:50:40	begin error log file: 
+2021/08/09 22:50:40	invalid first name entry: 	342940754325
+2021/08/09 22:50:40	invalid first name entry: 	5432
+2021/08/09 22:50:40	invalid first name entry: 	54
+2021/08/09 22:50:40	invalid first name entry: 	25243
+2021/08/09 22:50:40	invalid first name entry: 	562
+2021/08/09 22:50:40	invalid first name entry: 	5453
+2021/08/09 22:50:40	invalid first name entry: 	67
+2021/08/09 22:50:40	invalid first name entry: 	87645324
+2021/08/09 22:50:40	invalid first name entry: 	535434
+2021/08/09 22:50:40	invalid first name entry: 	
+2021/08/09 22:50:40	invalid first name entry: 	
+2021/08/09 22:50:40	invalid first name entry: 	
+2021/08/09 22:50:40	invalid first name entry: 	
+2021/08/09 22:50:40	invalid first name entry: 	
+2021/08/09 22:50:40	invalid first name entry: 	
+2021/08/09 22:50:40	invalid integer #1 entry
+2021/08/09 22:50:40	invalid integer #1 entry
+2021/08/09 22:50:40	invalid integer #1 entry
+2021/08/09 22:50:40	invalid integer #1 entry
+2021/08/09 22:50:40	invalid integer #1 entry
+2021/08/09 22:50:40	invalid integer #1 entry
+2021/08/09 22:50:40	file does not exist or invalid path: 2524
+2021/08/09 22:50:40	file does not exist or invalid path: 
+2021/08/09 22:50:40	file does not exist or invalid path: ????
+2021/08/09 22:50:40	invalid path or file does not exist: //////
+2021/08/09 22:50:40	invalid path or file does not exist: /////<><><><><><>
+2021/08/09 22:50:40	invalid path or file does not exist: ,.,.,
+2021/08/09 22:50:40	invalid path or file does not exist: <><><
+2021/08/09 22:50:40	invalid path or file does not exist: fdsafdsfdasf
+2021/08/09 22:50:40	invalid path or file does not exist: fdsfadfd
+2021/08/09 22:50:40	invalid path or file does not exist: fddfdsa
+2021/08/09 22:50:40	attempt to overwrite existing file:  /home/dustinr/Documents/School Related/TCSS/TCSS 360/Defensive-Coding-Practice/Java/src/ASH.txt
+2021/08/09 22:50:40	attempt to overwrite existing file:  /home/dustinr/Documents/School Related/TCSS/TCSS 360/Defensive-Coding-Practice/Java/src/ASH.txt
+2021/08/09 22:50:40	attempt to overwrite existing file:  //
+2021/08/09 22:50:40	attempt to overwrite existing file:  /
+2021/08/09 22:50:40	attempt to access protected disk areas: //.txt
+2021/08/09 22:50:40	attempt to overwrite existing file:  .
+2021/08/09 22:50:40	invalid password entry:      
+2021/08/09 22:50:40	invalid password entry:                              
+2021/08/09 22:50:40	invalid password entry: ///////
+2021/08/09 22:50:40	invalid password entry: ()*&^%$WESDFKLOP(*&^R%DXCJKOIP*&^RT

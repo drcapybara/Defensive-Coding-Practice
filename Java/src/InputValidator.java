@@ -3,12 +3,11 @@ import java.math.BigInteger;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Paths;
 import java.security.SecureRandom;
-import java.util.ArrayList;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.time.format.DateTimeFormatter;
-import java.time.LocalDateTime;
 
 /**
  * This program:
@@ -63,23 +62,23 @@ public class InputValidator {
     private BigInteger myProduct;
     /** Input file obtained from input file method. */
     private BufferedReader myInputFile;
-    /** Output file specified by use.r */
+    /** Output file specified by user */
     private BufferedWriter myOutputFile;
-    /** A list of captured errors during program execution. */
-    private ArrayList<String> myErrorLog;
-    /** Output file specified by use.r */
-    private BufferedWriter myErrorLogFile;
+    /** text file to track all incorrect entries by user. */
+    private final BufferedWriter myErrorLogFile;
+    /** text file to track all incorrect entries by user. */
+    private final BufferedWriter myPasswordFile;
 
     /** Constructor */
     public InputValidator() throws IOException {
 
-        myErrorLog = new ArrayList<>();
         myDtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
         myNow = LocalDateTime.now();
 
-        myErrorLogFile = new BufferedWriter(new FileWriter("error_log.txt"));
-
-
+        myErrorLogFile = new BufferedWriter(new FileWriter("error_log.log"));
+        myPasswordFile = new BufferedWriter(new FileWriter("password_db.txt"));
+        myErrorLogFile.write(myDtf.format(myNow).toString() + "\tbegin error log file: \n");
+        myPasswordFile.write("Account details: \n");
 
         getFirstName();
         getLastName();
@@ -92,7 +91,11 @@ public class InputValidator {
         getPassword();
         writeOutputFile();
 
-
+        myErrorLogFile.write("end error log, program successfully completed execution. ");
+        myErrorLogFile.flush();
+        myErrorLogFile.close();
+        myPasswordFile.flush();
+        myPasswordFile.close();
 
 
     }
@@ -113,17 +116,17 @@ public class InputValidator {
 
         while (checkPattern(input, regex)) {
             System.out.println("Im being really generous with what's allowed here... Please enter a valid first name... ");
-            myErrorLogFile.write(myDtf.format(myNow) + "\t" + "invalid first name entry: " + "\t" + input +"\n");
+            myErrorLogFile.write(myDtf.format(myNow).toString() + "\t" + "invalid first name entry: " + "\t" + input +"\n");
             input = sc.nextLine();
         }
         myFirstName = input;
-
+        myPasswordFile.write("First name: " + myFirstName + "\n");
 
     }
 
     /** Gets last name string.
      * with valid range between 2 to 50 characters. */
-    private void getLastName() {
+    private void getLastName() throws IOException {
 
         String nameRequirements = """
                 Please enter your last name:
@@ -137,34 +140,35 @@ public class InputValidator {
 
         while (checkPattern(input, regex)) {
             System.out.println(nameRequirements);
-            myErrorLog.add(myDtf.format(myNow) + "\t" + "invalid last name entry: " + "\t" + input);
+            myErrorLogFile.write(myDtf.format(myNow) + "\t" + "invalid last name entry: " + "\t" + input + "\n");
             input = sc.nextLine();
         }
         myLastName = input;
+        myPasswordFile.write("Last name: " + myLastName + "\n");
     }
 
     /** Gets an integer. */
-    private void getIntOne() {
+    private void getIntOne() throws IOException {
 
         Scanner sc = new Scanner(System.in);
         System.out.println("Please enter an integer: ");
 
         while (!sc.hasNextInt()) {
             System.out.println("Please enter a valid integer: ");
-            myErrorLog.add(myDtf.format(myNow) + "\t" + "invalid integer #1 entry");
+            myErrorLogFile.write(myDtf.format(myNow) + "\t" + "invalid integer #1 entry"+ "\n");
             sc.nextLine();
         }
         myFirstInt = sc.nextInt();
     }
 
     /**Gets another integer.  */
-    public void getIntTwo() {
+    public void getIntTwo() throws IOException {
 
         Scanner sc = new Scanner(System.in);
         System.out.println("Please enter another integer: ");
         while (!sc.hasNextInt()) {
             System.out.println("But...I thought we were friends... Please enter a valid integer. ");
-            myErrorLog.add(myDtf.format(myNow) + "\t" + "invalid integer #2 entry");
+            myErrorLogFile.write(myDtf.format(myNow) + "\t" + "invalid integer #2 entry" + "\n");
             sc.nextLine();
         }
         mySecondInt = sc.nextInt();
@@ -197,7 +201,7 @@ public class InputValidator {
      * https://stackoverflow.com/questions/11126315/what-are-optimal-scrypt-work-factors
      * valid password example: 48as4tAa1!48as4tAa1!
      */
-    public void getPassword() {
+    public void getPassword() throws IOException {
 
         String passwordRequirements = """
                 Please enter a password that contains at least:
@@ -217,7 +221,7 @@ public class InputValidator {
         String password = sc.nextLine();
         while (checkPattern(password, regex)) {
             System.out.println(passwordRequirements);
-            myErrorLog.add(myDtf.format(myNow) + "\t" + "invalid password entry: " + password);
+            myErrorLogFile.write(myDtf.format(myNow) + "\t" + "invalid password entry: " + password  + "\n");
             password = sc.nextLine();
         }
         String saltedPassword = password + salt;
@@ -227,14 +231,16 @@ public class InputValidator {
                 "This is taking a long time because I'm trying to thwart a timing analysis attack...");
         String generatedSecuredPasswordHash = com.lambdaworks.crypto.SCryptUtil.scrypt(saltedPassword, 1048576, 8, 1);
         System.out.println("Password hash generated: " + "\n" +generatedSecuredPasswordHash);
-        System.out.println("Please reenter password: ");
+        myPasswordFile.write("User password hash: " + generatedSecuredPasswordHash + "\n");
+        myPasswordFile.write("User salt for this hash: " + salt + "\n");
 
+        System.out.println("Please reenter password: ");
         password = sc.nextLine();
         System.out.println("Rehashing, please wait...");
         boolean matched = com.lambdaworks.crypto.SCryptUtil.check(password + salt, generatedSecuredPasswordHash);
         while (!matched) {
             System.out.println("Password reentry + salt matches original entry: " + false);
-            myErrorLog.add(myDtf.format(myNow) + "\t" + "invalid password entry: " + password);
+            myErrorLogFile.write(myDtf.format(myNow) + "\t" + "invalid password reentry: " + password  + "\n");
             System.out.println("Please reenter password: ");
             password = sc.nextLine();
             System.out.println("Rehashing, please wait...");
@@ -242,6 +248,7 @@ public class InputValidator {
         }
 
         System.out.println("Password reentry + salt matches original entry: " + true);
+
         System.out.println("Checking something different against password hash, please wait...");
         matched = com.lambdaworks.crypto.SCryptUtil.check("passwordno", generatedSecuredPasswordHash);
         System.out.println("Something different matches password hash: " + matched);
@@ -249,7 +256,7 @@ public class InputValidator {
     }
 
     /** Prompts for and reads the name of an input file from the user. Requires file txt extension. */
-    public void getInputFilePath() throws FileNotFoundException {
+    public void getInputFilePath() throws IOException {
 
         String regex = "^(?:(?:[a-z]:|\\\\\\\\[a-z0-9_.$●-]+\\\\[a-z0-9_.$●-]+)\\\\|\\\\?[^\\\\:*?\"<>|↵\\r\\n]+\\\\?)(?:[^\\\\:*?\"<>|\\r\\n]+\\\\)*[^\\\\:*?\"<>|\\r\\n]*$";
 
@@ -259,26 +266,26 @@ public class InputValidator {
 
         while (checkPattern(input, regex)) {
             System.out.println("Invalid characters in file path, please try again: ");
-            myErrorLog.add(myDtf.format(myNow) + "\t" + "invalid characters in filepath: " + input);
+            myErrorLogFile.write(myDtf.format(myNow) + "\t" + "invalid characters in filepath: " + input  + "\n");
             input = sc.nextLine();
         }
 
         try {
             while (!Paths.get(input).toFile().exists()) {
                 System.out.println("file does not exist or invalid path was supplied, lets bring it around for another try. Please enter a path to a file: ");
-                myErrorLog.add(myDtf.format(myNow) + "\t" + "file does not exist or invalid path: " + input);
+                myErrorLogFile.write(myDtf.format(myNow) + "\t" + "file does not exist or invalid path: " + input  + "\n");
                 input = sc.nextLine();
             }
         } catch (InvalidPathException e) {
             System.out.println("Invalid path detected, please try again: ");
-            myErrorLog.add(myDtf.format(myNow) + "\t" + "invalid path on windows system: " + input);
+            myErrorLogFile.write(myDtf.format(myNow) + "\t" + "invalid path on windows system: " + input  + "\n");
             getInputFilePath();
         }
 
         //now check to see if that file actually exists.
         while (!new File(input).exists() || new File(input).isDirectory()) {
             System.out.println("File does not exist or you supplied a bad path: please enter a valid file path: ");
-            myErrorLog.add(myDtf.format(myNow) + "\t" + "invalid path or file does not exist: " + input);
+            myErrorLogFile.write(myDtf.format(myNow) + "\t" + "invalid path or file does not exist: " + input  + "\n");
             input = sc.nextLine();
         }
         myInputFile = new BufferedReader(new FileReader(input));
@@ -296,13 +303,13 @@ public class InputValidator {
 
         while (checkPattern(input, regex)) {
             System.out.println("Invalid characters in file path, please try again: ");
-            myErrorLog.add(myDtf.format(myNow) + "\t" + "invalid characters in filepath: " + input);
+            myErrorLogFile.write(myDtf.format(myNow) + "\t" + "invalid characters in filepath: " + input  + "\n");
             input = sc.nextLine();
         }
 
         while (input.length() == 0) {
             System.out.println("Please enter a valid output filepath, length of path must be greater than zero: ");
-            myErrorLog.add(myDtf.format(myNow) + "\t" + "filepath of length 0 supplied: " + input);
+            myErrorLogFile.write(myDtf.format(myNow) + "\t" + "filepath of length 0 supplied: " + input  + "\n");
             input = sc.nextLine();
         }
 
@@ -315,16 +322,16 @@ public class InputValidator {
                 }
             } else {
                 System.out.println("Output file already exists, please specify a different output file: ");
-                myErrorLog.add(myDtf.format(myNow) + "\t" + "attempt to overwrite existing file:  " + input);
+                myErrorLogFile.write(myDtf.format(myNow) + "\t" + "attempt to overwrite existing file:  " + input  + "\n");
                 getOutPutFile();
             }
         } catch (InvalidPathException e) {
             System.out.println("Invalid path detected, please try again: ");
-            myErrorLog.add(myDtf.format(myNow) + "\t" + "invalid path on windows system: " + input);
+            myErrorLogFile.write(myDtf.format(myNow) + "\t" + "invalid path on windows system: " + input  + "\n");
             getOutPutFile();
         } catch (IOException e) {
             System.out.println("possible permission violation, please try again and stay the heck away from my sensitive files: ");
-            myErrorLog.add(myDtf.format(myNow) + "\t" + "attempt to access protected disk areas: " + input);
+            myErrorLogFile.write(myDtf.format(myNow) + "\t" + "attempt to access protected disk areas: " + input  + "\n");
             getOutPutFile();
         }
     }
