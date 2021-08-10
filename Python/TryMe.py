@@ -4,6 +4,14 @@ from classes import Name, FourByteSignedInt, Password
 import os
 
 
+def print_error(type: str, message):
+    error_file = open("./problem_report.txt", encoding="utf-8", mode="a")
+    stamp = datetime.datetime.now()
+    error_file.write(f"{stamp} Problem type: {type}, Problem desc: {str(message)}\n")
+    error_file.close()
+    # print(f"{stamp} Problem type: {type}, Problem desc: {message}\n", file=errors_file)
+
+
 def get_names() -> (str, str):
     print(
         "------------------------------------\n"
@@ -22,13 +30,15 @@ def get_names() -> (str, str):
             last_name = Name(given_name=input(" Last Name?: "))
             loop = False
             print("Now THIS is a name.")
-        except ValueError:
+        except ValueError as ve:
+            print_error("ValueError", ve)
             print("That's not a name!")
 
     return first_name, last_name
 
 
 def get_integers() -> (FourByteSignedInt, FourByteSignedInt):
+    global error_list
     print(
         "------------------------------------\n"
         "Step 2: Four-Byte Numbers\n"
@@ -39,7 +49,7 @@ def get_integers() -> (FourByteSignedInt, FourByteSignedInt):
     def flow_enforcement(val_1, val_2):
         valid_format = isinstance(val_1.value, int) and isinstance(val_2.value, int)
         if not valid_format:
-            raise ValueError
+            raise ValueError("Didn't find two integers.")
 
         a = int(val_1.value)
         b = int(val_2.value)
@@ -50,7 +60,7 @@ def get_integers() -> (FourByteSignedInt, FourByteSignedInt):
         )
 
         if not valid_range:
-            raise ValueError
+            raise ValueError("Integers out of range.")
 
     loop = True
     num1 = FourByteSignedInt("0")
@@ -63,7 +73,8 @@ def get_integers() -> (FourByteSignedInt, FourByteSignedInt):
             flow_enforcement(val_1=num1, val_2=num2)
             loop = False
             print("The math checks out!")
-        except ValueError:
+        except ValueError as ve:
+            print_error("ValueError", ve)
             print("These are not the numbers we're looking for...")
 
     return int(num1.value), int(num2.value)
@@ -91,13 +102,16 @@ def get_input_filename() -> str:
                 del trash
                 file.close()
                 return proposed_path
-            except OSError:
+            except OSError as ose:
+                print_error("OSError", ose)
                 print("File invalid.")
                 loop = True
-            except UnicodeDecodeError:
+            except UnicodeDecodeError as ude:
+                print_error("UnicodeDecodeError", "Found non-text bytes in input.")
                 print("File invalid.")
                 loop = True
-            except ValueError:
+            except ValueError as ve:
+                print_error("ValueError", ve)
                 print("Try again.")
                 loop = True
 
@@ -111,18 +125,21 @@ def get_output_filename(in_file_name: str) -> str:
     )
     loop = True
     while loop:
-        proposed_path = input("Input Filename: ")
+        proposed_path = input("Output Filename: ")
         if safe_path(os.getcwd(), proposed_path) and proposed_path.endswith(".txt"):
             if proposed_path == in_file_name:
+                print_error("ValueError", "Cannot provide same path for input and output files.")
                 print("Filename cannot match input.")
-                continue
-            try:
-                open(proposed_path, mode="a", errors="strict", encoding="utf-8").close()
-                return proposed_path
-            except OSError:
-                loop = True
-            except ValueError:
-                loop = True
+            else:
+                try:
+                    open(proposed_path, mode="a", errors="strict", encoding="utf-8").close()
+                    return proposed_path
+                except OSError as ose:
+                    print_error("OSError", ose)
+                    loop = True
+                except ValueError as ve:
+                    print_error("ValueError", ve)
+                    loop = True
 
 
 def get_password(salt):
@@ -148,8 +165,9 @@ def get_password(salt):
             with open(temp_pwd, mode="xb") as tmp:
                 tmp.write(phrase.hashed)
             loop = False
-        except ValueError as e:
-            print(e)
+        except ValueError as ve:
+            print_error("ValueError", ve)
+            print(ve)
             print("Invalid password.")
             try:
                 os.remove(temp_pwd)
@@ -171,7 +189,8 @@ def confirm_password(hash_file, salt):
     try:
         phrase_two = Password(given_word=input(" Confirm Password: "), given_salt=salt, confirming=True)
         confirmed = phrase_two.hashed == prev_hash
-    except ValueError:
+    except ValueError as ve:
+        print_error("ValueError", ve)
         confirmed = False
 
     return confirmed

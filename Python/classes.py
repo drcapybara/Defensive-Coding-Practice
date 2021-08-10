@@ -11,7 +11,7 @@ class Name:
     def validate(self, given: str):
         result = re.match(self.name_rexp, string=given)
         if result is None:
-            raise ValueError
+            raise ValueError("Input corrupted/not a name.")
         else:
             return result.group(1)
 
@@ -27,14 +27,14 @@ class FourByteSignedInt:
             int(given_value) < self.four_byte_min
             or int(given_value) > self.four_byte_max
         ):
-            raise ValueError
+            raise ValueError("Did not receive a four byte twos-complement integer.")
         else:
             self.value = self.validate(given_value)
 
     def validate(self, given: str):
         result = re.match(pattern=self.num_rexp, string=given)
         if result is None:
-            raise ValueError
+            raise ValueError("Input contained non-numbers.")
         else:
             return int(result.group(1))
 
@@ -97,4 +97,4 @@ class Password:
                 maxmem=(cpu_factor * 2 * 8 * 65),
             )
         else:
-            raise ValueError
+            raise ValueError("Password given did not meet criteria.")
