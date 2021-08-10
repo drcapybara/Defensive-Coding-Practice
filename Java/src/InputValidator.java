@@ -227,7 +227,7 @@ public class InputValidator {
     public void getInputFilePath() throws FileNotFoundException {
 
         Scanner sc = new Scanner(System.in);
-        System.out.println("Please enter a path to an input file: ");
+        System.out.println("Please enter a path to an input file: (File must exist and can be of any format) ");
         String input = sc.nextLine();
 
         while(!Paths.get(input).toFile().exists()) {
@@ -268,9 +268,6 @@ public class InputValidator {
             System.out.println("Cannot overwrite the selected input file: please enter a valid output file path: ");
             input = sc.nextLine();
         }
-
-
-
     }
 
 
